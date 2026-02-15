@@ -1,16 +1,32 @@
-# React + Vite
+# Calculadora de Propinas y Consumo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este proyecto consiste en una aplicación web de utilidad desarrollada con la librería **React** y el entorno de desarrollo **Vite**. La aplicación simula un sistema de facturación para restaurantes que permite a los usuarios seleccionar platillos de un menú, visualizar su consumo en tiempo real, calcular propinas basadas en porcentajes predefinidos y obtener los totales finales a pagar.
 
-Currently, two official plugins are available:
+## Tecnologías Principales
+* **React JS:** Librería de JavaScript para la construcción de interfaces de usuario interactivas.
+* **Vite:** Herramienta de construcción (build tool) para un entorno de desarrollo rápido y optimizado.
+* **Tailwind CSS:** Framework de utilidad (utility-first) para el diseño de la interfaz y estilos responsivos.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Implementación Técnica y Conceptos Clave
+El desarrollo de esta aplicación se centró en la implementación de conceptos fundamentales de React, manipulación de estado y lógica de programación moderna:
 
-## React Compiler
+### 1. Componentización y Props
+La arquitectura del proyecto se basa en la división de la interfaz en componentes reutilizables y modulares (`MenuItem`, `OrderContents`, `OrderTotals`, `TipPercentageForm`). La comunicación entre estos componentes y el componente principal (`App.jsx`) se realiza mediante el paso de **Props** y funciones, manteniendo un flujo de datos unidireccional.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 2. Renderizado Dinámico (Mapping)
+Para la visualización del menú, se utilizó el método `.map()` de JavaScript. La aplicación itera sobre una base de datos local (arreglo de objetos en `db.js`) para generar dinámicamente los elementos de la interfaz. Esto permite que el menú sea escalable y fácil de mantener sin modificar la estructura del componente.
 
-## Expanding the ESLint configuration
+### 3. Gestión de Estado Complejo (useState)
+La interactividad principal reside en el manejo del estado mediante el Hook `useState`. Se gestionan dos estados críticos:
+* **Order (La Orden):** Un arreglo que almacena dinámicamente los objetos seleccionados, controlando qué ítems se han añadido y en qué cantidad.
+* **Tip (Propina):** Un valor numérico que almacena el porcentaje de propina seleccionado por el usuario.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 4. Estado Derivado y Memorización (useMemo)
+Para optimizar el rendimiento y evitar cálculos innecesarios en cada renderizado, se implementó el Hook `useMemo`.
+* **Cálculos Automáticos:** El subtotal, el monto de la propina y el total final no se almacenan en el estado; se calculan "al vuelo" basándose en el estado actual de la orden y la propina.
+* **Eficiencia:** `useMemo` asegura que estos cálculos matemáticos solo se ejecuten cuando las dependencias (`order` o `tip`) cambien, mejorando la eficiencia de la aplicación.
+
+### 5. Inmutabilidad en la Actualización del Estado
+Se aplicaron principios de inmutabilidad para manipular el arreglo de la orden:
+* **Agregar Items:** Se utiliza lógica para verificar si un artículo ya existe. Si existe, se crea una copia del arreglo y se actualiza solo la cantidad (evitando duplicados); si no, se agrega el nuevo objeto.
+* **Eliminar Items:** Se utiliza el método `.filter()` para devolver un nuevo arreglo que excluye el elemento seleccionado, sin mutar el estado original directamente.
